@@ -14,8 +14,5 @@ const Publisher = sequelize.define('Publisher', {
 },
     {
         tableName:'publishers',
-        createdAt:false,
-        updatedAt:false,
-
     });
 export default Publisher;

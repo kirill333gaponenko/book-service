@@ -15,6 +15,9 @@ const sequelize = new Sequelize(
       dialect: process.env.DB_DIALECT || 'mysql',
       port: process.env.DB_PORT || 3306,
       logging: false,
+      define:{
+            timestamps:false
+        }
     })
 
 //DB connection

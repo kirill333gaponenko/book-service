@@ -17,8 +17,6 @@ const Author = sequelize.define('author', {
     }
 },{
     tableName:'authors',
-    createdAt:false,
-    updatedAt:false,
 });
 
 export default Author;
