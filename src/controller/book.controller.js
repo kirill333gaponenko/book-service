@@ -54,19 +54,62 @@ export const addBook = async (req, res) => {
 
 
 export const findBookByIsbn = async (req, res) => {
-    const book = await Book.findByPk(req.params.isbn);
+    const book = await Book.findByPk(req.params.isbn,{
+        include:[{
+            model:Author,
+            as:'authors',
+            attributes:{
+                include:['name', [sequelize.col('birth_date'), 'birthDate']],
+                exclude:['birth_date']
+            },
+            through:{
+                attributes:[]
+            }
+        }]
+    });
     if (book) {
-        const result = {
-            isbn:book.isbn,
-            title:book.title,
-            publisher:book.publisher,
-            authors:(await book.getAuthors()).map(author => ({
-                name:author.name,
-                birthDate:author.birth_date
-            }))
-        }
-        return res.json(result);
+
+
+        return res.json(book);
     }else{
         return res.status(404).send({error: 'Book not found'});
+    }
+}
+
+export const removeBook = async (req, res) => {
+    
+    const t = await sequelize.transaction({readOnly:true});
+    try{
+        const book = await Book.findByPk(req.params.isbn,{
+            include:[{
+                model:Author,
+                as:'authors',
+                attributes:{
+                    include:['name', [sequelize.col('birth_date'), 'birthDate']],
+                    exclude:['birth_date']
+                },
+                through:{
+                    attributes:[]
+                }
+            }],
+            transaction:t
+        });
+        if (book) {
+            await book.destroy({transaction:t});
+            await t.commit();
+            return res.json(book)
+        }else{
+            await t.rollback();
+            return res.status(404).send({error: 'Book not found'});
+        }
+
+
+    }catch (e) {
+        await t.rollback();
+        console.log(e);
+        return res.status(500).send({
+            error:e.message,
+            message: 'Internal server error'
+        });
     }
 }
