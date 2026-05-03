@@ -3,7 +3,7 @@ import {sequelize} from "../config/database.js";
 
 export const addBook = async (req, res) => {
 
-    const t =await sequelize.transaction({readOnly:true});
+    const t =await sequelize.transaction();
     try {
 
 
@@ -78,7 +78,7 @@ export const findBookByIsbn = async (req, res) => {
 
 export const removeBook = async (req, res) => {
     
-    const t = await sequelize.transaction({readOnly:true});
+    const t = await sequelize.transaction();
     try{
         const book = await Book.findByPk(req.params.isbn,{
             include:[{
@@ -113,10 +113,10 @@ export const removeBook = async (req, res) => {
         });
     }
 }
-export const updateBook = async (req, res) => {
+export const updateBookTitle = async (req, res) => {
 
 
-    const t = await sequelize.transaction({readOnly:true});
+    const t = await sequelize.transaction();
     try{
         const book = await Book.findByPk(req.params.isbn,{
                 include:[{
@@ -153,8 +153,9 @@ export const updateBook = async (req, res) => {
 }
 
 export const findBooksByAuthor = async (req, res) => {
-
-    const books = await Book.findAll({})
-
+    //TODO: Implement books search by author
+}
+export const findBooksByPublisher = async (req,res) =>{
+    //TODO: Implement books search by publisher logic
 
 }
