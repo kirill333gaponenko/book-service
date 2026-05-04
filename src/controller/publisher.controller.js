@@ -7,22 +7,20 @@ export const findPublishersByAuthor = async (req, res) => {
         return res.status(404).send({error: 'Author not found'});
     }
 
-    const books = await Book.findAll({
-        include:
-            {
-                model:Author,
-                as:'authors',
-                where:{name:req.params.name},
-                through:{
-                    attributes:[]
-                }
+    const publishers = await Book.aggregate('publisher','DISTINCT', {
+        plain:false,
+        include:{
+            model:Author,
+            as:'authors',
+            where:{
+                name:req.params.name,
             },
-        attributes:['publisher'],
-        raw:true,
-        group:['publisher']
-
+            through:{
+                attributes:[]
+            }
+        }
     })
-    return res.json(books.map(book=>book.publisher));
+    return res.json(publishers.map(publisher=>publisher.DISTINCT));
 
 
 }
