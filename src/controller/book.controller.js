@@ -135,6 +135,9 @@ export const updateBookTitle = async (req, res) => {
         )
         if(book){
             await book.update({title:req.params.title},{transaction:t});
+            // book.title = req.params.title;
+            // await book.save({transaction:t}); another option
+
             await t.commit();
             return res.json(book);
         }else{
@@ -153,9 +156,52 @@ export const updateBookTitle = async (req, res) => {
 }
 
 export const findBooksByAuthor = async (req, res) => {
-    //TODO: Implement books search by author
+
+    const author = await Author.findByPk(req.params.name);
+    if(!author){
+        return res.status(404).send({error: 'Author not found'});
+    }
+    const books = await author.getBooks({
+        include:[{
+            model:Author,
+            as:'authors',
+            attributes:{
+                include:['name', [sequelize.col('birth_date'), 'birthDate']],
+                exclude:['birth_date']
+            },
+            through:{
+                attributes:[]
+            }
+        }],
+        joinTableAttributes:[]
+    })
+    return res.json(books);
+
 }
 export const findBooksByPublisher = async (req,res) =>{
-    //TODO: Implement books search by publisher logic
+
+    const publisher = await Publisher.findByPk(req.params.publisher);
+    if(!publisher){
+        return res.status(404).send({error: 'Author not found'});
+    }
+    const books = await Book.findAll({
+        where:{
+            publisher:req.params.publisher
+        },
+        include:[
+            {
+                model:Author,
+                as:'authors',
+                attributes:{
+                    include:['name', [sequelize.col('birth_date'), 'birthDate']],
+                    exclude:['birth_date']
+                },
+                through:{
+                    attributes:[]
+                }
+            }
+        ]
+    })
+    return res.json(books);
 
 }
