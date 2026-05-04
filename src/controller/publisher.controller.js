@@ -1,4 +1,4 @@
-import {Author} from "../model/index.js";
+import {Author, Book} from "../model/index.js";
 
 export const findPublishersByAuthor = async (req, res) => {
 
@@ -7,10 +7,22 @@ export const findPublishersByAuthor = async (req, res) => {
         return res.status(404).send({error: 'Author not found'});
     }
 
-    const books = await author.getBooks();
-    const publishers = [...new Set(books.map(book => book.publisher))];
-    return res.json(publishers);
+    const books = await Book.findAll({
+        include:
+            {
+                model:Author,
+                as:'authors',
+                where:{name:req.params.name},
+                through:{
+                    attributes:[]
+                }
+            },
+        attributes:['publisher'],
+        raw:true,
+        group:['publisher']
 
+    })
+    return res.json(books.map(book=>book.publisher));
 
 
 }
