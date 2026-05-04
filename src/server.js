@@ -4,6 +4,7 @@ import express from "express";
 import {syncModels} from "./model/index.js";
 import bookRoutes from "./routes/book.routes.js";
 import authorRoutes from "./routes/author.routes.js";
+import publisherRoutes from "./routes/publisher.routes.js";
 
 
 dotenv.config();
@@ -13,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(bookRoutes)
 app.use(authorRoutes)
-app.use(authorRoutes)
+app.use(publisherRoutes)
 
 
 const startServer = async () => {
